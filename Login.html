@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="" />
+    <meta
+      name="author"
+      content="Mark Otto, Jacob Thornton, and Bootstrap contributors"
+    />
+    <meta name="generator" content="Hugo 0.84.0" />
+    <title>Signin Template · Bootstrap v5.0</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+
+      .error {
+        color: red;
+      }
+
+      .success {
+        color: green;
+      }
+    </style>
+  </head>
+  <body class="text-center">
+    <main class="form-signin">
+      <form>
+        <img
+          class="mb-4"
+          src="./Login_files/bootstrap-logo.svg"
+          alt=""
+          width="72"
+          height="57"
+        />
+        <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
+
+        <div class="form-floating">
+          <input
+            type="email"
+            class="form-control"
+            id="email"
+            placeholder="name@example.com"
+          />
+          <label for="email">Email address</label>
+        </div>
+        <div class="form-floating">
+          <input
+            type="password"
+            class="form-control"
+            id="password"
+            placeholder="Password"
+          />
+          <label for="floatingPassword">Password</label>
+        </div>
+        <div class="form-floating">
+          <input
+            type="tel"
+            class="form-control"
+            id="phone"
+            placeholder="(XX) XXXXX-XXXX"
+          />
+          <label for="phone">Phone</label>
+        </div>
+        <div class="form-floating">
+          <input
+            type="text"
+            class="form-control"
+            id="cpf"
+            placeholder="XXX.XXX.XXX-XX"
+          />
+          <label for="cpf">CPF</label>
+        </div>
+        <div class="form-floating">
+          <input
+            type="password"
+            class="form-control"
+            id="confirmPassword"
+            placeholder="Confirm Password"
+          />
+          <label for="confirmPassword">Confirm Password</label>
+        </div>
+        <div>
+          <span role="alert" id="messageFeedback" aria-hidden="true" class="error">
+            (...)
+          </span>
+        </div>
+        <button
+          id="signin"
+          class="w-100 btn btn-lg btn-primary"
+          type="button"
+          onclick="register()"
+        >
+          Register
+        </button>
+
+        <p class="mt-5 mb-3 text-muted">© 2022</p>
+      </form>
+    </main>
+    <script>
+      function register() {
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+        const phone = document.getElementById("phone").value;
+        const cpf = document.getElementById("cpf").value;
+        const confirmPassword = document.getElementById("confirmPassword").value;
+
+        if (!validateIfFieldsBeFilled(email, password, phone, cpf, confirmPassword)) {
+          messageFeedback("Todos os campos devem ser preenchidos!", true);
+          return;
+        }
+        
+        if (!emailIsValid(email)) {
+          messageFeedback("Formato de email inválido!", true);
+          return;
+        }
+
+        if (password.length < 8) {
+          messageFeedback("A senha deve ter no mínimo 8 caracteres!", true);
+          return;
+        }
+
+        if (password !== confirmPassword) {
+          messageFeedback("As senhas não coincidem!", true);
+          return;
+        }
+
+        if (!validatePhone(phone)) {
+          messageFeedback("Formato de telefone incorreto!", true);
+          return;
+        }
+
+        if (!validateCPF(cpf)) {
+          messageFeedback("CPF inválido!", true);
+          return;
+        }
+
+        messageFeedback(
+          "Cadastro realizado com sucesso!",
+          false
+        );
+      }
+
+      function messageFeedback(errorMessage, error) {
+        const messageFeedback = document.getElementById("messageFeedback");
+        if (error) messageFeedback.className = "error";
+        else messageFeedback.className = "success";
+
+        messageFeedback.classList.add("visible");
+        messageFeedback.setAttribute("aria-hidden", false);
+        messageFeedback.innerHTML = errorMessage;
+      }
+
+      function emailIsValid(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      }
+
+      function validateIfFieldsBeFilled(email, password, phone, cpf, confirmPassword) {
+        return email.trim().length && password.trim().length && phone.trim().length && cpf.trim().length && confirmPassword.trim().length;
+      }
+
+      function validatePhone(phone) {
+        const phonePattern = /^\(\d{2}\) \d{5}-\d{4}$/;
+        return phonePattern.test(phone);
+      }
+
+      function validateCPF(cpf) {
+        const cpfPattern = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
+        if (!cpfPattern.test(cpf)) return false;
+
+        const numbers = cpf.replace(/\D/g, "");
+
+        // CPF inválido se todos os dígitos forem iguais
+        if (/^(\d)\1+$/.test(numbers)) return false;
+
+        // Cálculo do primeiro dígito verificador
+        let sum = 0;
+        for (let i = 0; i < 9; i++) {
+          sum += parseInt(numbers.charAt(i)) * (10 - i);
+        }
+        let firstVerifier = (sum * 10) % 11;
+        if (firstVerifier === 10) firstVerifier = 0;
+
+        if (firstVerifier !== parseInt(numbers.charAt(9))) return false;
+
+        // Cálculo do segundo dígito verificador
+        sum = 0;
+        for (let i = 0; i < 10; i++) {
+          sum += parseInt(numbers.charAt(i)) * (11 - i);
+        }
+        let secondVerifier = (sum * 10) % 11;
+        if (secondVerifier === 10) secondVerifier = 0;
+
+        return secondVerifier === parseInt(numbers.charAt(10));
+      }
+    </script>
+  </body>
+</html>
